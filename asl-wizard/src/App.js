@@ -224,7 +224,6 @@ const App = () => {
               <button onClick={isRecording ? handleStopRecording : handleStartRecording}>
                 {isRecording ? "⏹ Stop Recording" : "▶ Start Recording"}
               </button>
-              <button>Need a hint?</button>
             </div>
 
             <button style={{ width: "100%", padding: "0.75rem", marginTop: "1rem" }}>Check</button>
