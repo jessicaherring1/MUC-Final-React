@@ -4,18 +4,18 @@ import Webcam from "react-webcam";
 const levels = [
   {
     type: "drag-and-drop",
-    sentence: "Will you be my friend?",
-    words: ["will", "friend", "you", "future", "my", "be"],
-    correctAnswer: ["you", "future", "friend"]
+    sentence: "Mom is going to work.",
+    words: ["work", "Mom", "is", "future", "go", "going"],
+    correctAnswer: ["go", "Mom", "work"]
   },
   {
     type: "sign-only",
-    sentence: "Will you be my friend?",
-    hintWords: ["you", "future", "friend"]
+    sentence: "You have school tomorrow",
+    hintWords: ["you", "school", "tomorrow"]
   },
   {
     type: "sign-and-type",
-    sentence: "How’s the weather today?"
+    sentence: "What is the baby doing in the image above?"
   },
   {
     type: "complete"
@@ -205,6 +205,11 @@ const App = () => {
 
       {currentLevel.type === "sign-and-type" && (
         <>
+        <img 
+      src="/images/babycry.jpg"
+      alt="Baby Crying" 
+      style={{ width: "100%", maxHeight: "200px", objectFit: "contain", marginBottom: "1rem", borderRadius: "12px" }} 
+    />
           <p><strong>Respond to this sentence:</strong><br />{currentLevel.sentence}</p>
 
           <input
