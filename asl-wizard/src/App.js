@@ -4,6 +4,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from './HomePage';
 import Level0 from './levels/Level0';
 import Level1 from './levels/Level1';
+import Level3 from './levels/Level3';
+
 
 function App() {
   return (
@@ -24,7 +26,7 @@ function App() {
         />
         {/* Future routes for Level 2 and Level 3 */}
         {/* <Route path="/level2" element={<Level2 />} /> */}
-        {/* <Route path="/level3" element={<Level3 />} /> */}
+        <Route path="/level3" element={<Level3 />} />
       </Routes>
     </Router>
   );
