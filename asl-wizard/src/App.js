@@ -210,7 +210,7 @@ const App = () => {
       alt="Baby Crying" 
       style={{ width: "100%", maxHeight: "200px", objectFit: "contain", marginBottom: "1rem", borderRadius: "12px" }} 
     />
-          <p><strong>Respond to this sentence:</strong><br />{currentLevel.sentence}</p>
+          <p><strong>Answer this question using the signs you would use in ASL: </strong><br/><br />{currentLevel.sentence}</p>
 
           <input
             type="text"
