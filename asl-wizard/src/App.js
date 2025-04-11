@@ -11,7 +11,7 @@ const levels = [
   {
     type: "sign-only",
     sentence: "You have school tomorrow",
-    hintWords: ["you", "school", "tomorrow"]
+    hintWords: ["tomorrow", "school", "you"]
   },
   {
     type: "sign-and-type",
