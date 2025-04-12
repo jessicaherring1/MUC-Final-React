@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from "framer-motion";
 const coreWords = [
   {
     word: "More",
-    videoUrl: "https://asl-lex.org/visualization/videos/more.mp4",
     scenario: "Your child wants another bite of food. What do you sign?"
   },
   {
@@ -71,6 +70,9 @@ export default function Level0() {
     if (current > 0) setCurrent(current - 1);
   };
 
+  const sanitizedWord = coreWords[current].word.toLowerCase().replace(/\s+/g, '_');
+
+
   return (
     <div style={{ padding: '1rem' }}>
       <AnimatePresence mode="wait">
@@ -98,18 +100,17 @@ export default function Level0() {
           >
             <div style={{ textAlign: 'center', border: '1px solid #ccc', padding: '2rem', borderRadius: '1rem' }}>
               <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>Sign: {coreWords[current].word}</h2>
-              <video
-                key={coreWords[current].videoUrl}
-                style={{ margin: '1rem auto', borderRadius: '1rem' }}
-                autoPlay
-                loop
-                muted
-                playsInline
-                aria-label={`ASL sign for ${coreWords[current].word}`}
-                src={coreWords[current].videoUrl}
-                width={320}
-                height={240}
+
+              <iframe
+                key={sanitizedWord}
+                title={`ASL sign for ${coreWords[current].word}`}
+                src={`https://asl-lex.org/visualization/?sign=${sanitizedWord}`}
+                width="100%"
+                height="400"
+                style={{ border: 'none', borderRadius: '12px', margin: '1rem 0' }}
               />
+
+
               <p style={{ fontStyle: 'italic', color: '#555' }}>{coreWords[current].scenario}</p>
               <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '1rem' }}>
                 <button onClick={prev} disabled={current === 0} style={{ padding: '0.5rem 1rem' }}>Previous</button>
