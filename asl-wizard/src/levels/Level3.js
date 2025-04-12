@@ -1,23 +1,21 @@
-// Level3.js
 import React, { useState, useRef } from "react";
 import Webcam from "react-webcam";
 import update from "immutability-helper";
+import HomeButton from '../HomeButton';
 
-const initialWords = ["work", "Mom", "is", "future", "go", "going"];
-const correctOrder = ["go", "Mom", "work"];
+
+const initialWords = ["work", "I", "am", "future", "go", "going"];
+const correctOrder = ["go", "I", "work"];
 
 function Level3() {
   const [selectedWords, setSelectedWords] = useState([]);
   const [recordings, setRecordings] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [mediaRecorders, setMediaRecorders] = useState({});
-  const [recordChunks, setRecordChunks] = useState({});
   const [recordingIndex, setRecordingIndex] = useState(null);
   const [researcherComment, setResearcherComment] = useState("");
   const [isApproved, setIsApproved] = useState(null);
   const [showHint, setShowHint] = useState(false);
-  const [visibleHints, setVisibleHints] = useState({});
-
   const [showAnswer, setShowAnswer] = useState(false);
 
   const webcamRef = useRef(null);
@@ -31,14 +29,19 @@ function Level3() {
   };
 
   const startRecording = (index) => {
-    const stream = webcamRef.current.stream;
-    const recorder = new MediaRecorder(stream, { mimeType: "video/webm" });
-
+    const stream = webcamRef.current?.video?.srcObject;
+    if (!stream) {
+      alert("Webcam not ready. Please wait a moment and try again.");
+      return;
+    }
+  
     const chunks = [];
+    const recorder = new MediaRecorder(stream, { mimeType: "video/webm" });
+  
     recorder.ondataavailable = (e) => {
       if (e.data.size > 0) chunks.push(e.data);
     };
-
+  
     recorder.onstop = () => {
       const blob = new Blob(chunks, { type: "video/webm" });
       const url = URL.createObjectURL(blob);
@@ -47,12 +50,12 @@ function Level3() {
       setRecordings(updated);
       setRecordingIndex(null);
     };
-
+  
     recorder.start();
     setMediaRecorders((prev) => ({ ...prev, [index]: recorder }));
-    setRecordChunks((prev) => ({ ...prev, [index]: chunks }));
     setRecordingIndex(index);
   };
+  
 
   const stopRecording = (index) => {
     const recorder = mediaRecorders[index];
@@ -66,39 +69,22 @@ function Level3() {
     });
     return correctCount;
   };
-  
-  const toggleHint = (index) => {
-    setVisibleHints((prev) => ({
-      ...prev,
-      [index]: !prev[index]
-    }));
+
+  const checkAnswer = () => {
+    const currentOrder = recordings.map((r) => r.word);
+    return JSON.stringify(currentOrder) === JSON.stringify(correctOrder);
   };
-  
-  const aslVideos = {
-    go: "https://asl-lex.org/visualization/videos/go.mp4",
-    Mom: "https://asl-lex.org/visualization/videos/mom.mp4",
-    work: "https://asl-lex.org/visualization/videos/work.mp4",
-    is: "https://asl-lex.org/visualization/videos/is.mp4",
-    future: "https://asl-lex.org/visualization/videos/future.mp4",
-    going: "https://asl-lex.org/visualization/videos/going.mp4"
-  };  
 
   const handleReorder = (fromIndex, toIndex) => {
     const updated = update(recordings, {
       $splice: [
         [fromIndex, 1],
-        [toIndex, 0, recordings[fromIndex]]
-      ]
+        [toIndex, 0, recordings[fromIndex]],
+      ],
     });
     setRecordings(updated);
-    setSelectedWords(updated.map(r => r.word));
+    setSelectedWords(updated.map((r) => r.word));
   };
-
-  const checkAnswer = () => {
-    const currentOrder = recordings.map(r => r.word);
-    return JSON.stringify(currentOrder) === JSON.stringify(correctOrder);
-  };
-  
 
   const handleRemove = (index) => {
     const updatedWords = [...selectedWords];
@@ -126,7 +112,7 @@ function Level3() {
     setShowModal(false);
     setTimeout(() => {
       feedbackRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, 350); // More reliable scroll after modal closes
+    }, 350);
   };
 
   const handleReject = () => {
@@ -137,9 +123,64 @@ function Level3() {
     }, 350);
   };
 
+  const renderCameraPreview = () => (
+    <div
+      style={{
+        width: "100%",
+        borderRadius: "12px",
+        overflow: "hidden",
+        marginBottom: "1rem",
+        border: "2px solid #ccc",
+      }}
+    >
+      <Webcam
+        audio={false}
+        mirrored={false}
+        ref={webcamRef}
+        screenshotFormat="image/jpeg"
+        style={{
+          width: "100%",
+          height: "auto",
+          objectFit: "cover",
+        }}
+      />
+    </div>
+  );
+
   return (
     <div style={{ padding: "1rem", maxWidth: "600px", margin: "auto" }}>
-      <h2>Translate this sentence: <em>Mom is going to work.</em></h2>
+      <HomeButton />
+      <h2>Translate this sentence: <em>I am going to work.</em></h2>
+
+      <div style={{ marginBottom: "0.5rem" }}>
+        <h3>📹 Live Camera Preview</h3>
+        {renderCameraPreview()}
+      </div>
+
+      {recordings.filter((r) => r.url).length > 0 && (
+        <>
+          <h4>🎞️ Previous Sign Recordings</h4>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", marginBottom: "1rem" }}>
+            {recordings
+              .filter((r) => r.url)
+              .map((rec, i) => (
+              <video
+                key={i}
+                src={rec.url}
+                controls
+                style={{
+                  width: "100px",
+                  height: "75px",
+                  borderRadius: "6px",
+                  objectFit: "cover",
+                  border: "1px solid #ccc"
+                }}
+              />
+
+              ))}
+          </div>
+        </>
+      )}
 
       <div style={{ border: "1px dashed #aaa", padding: "1rem", marginBottom: "1rem" }}>
         {selectedWords.map((word, index) => (
@@ -168,21 +209,30 @@ function Level3() {
       {!showAnswer && (
         <button
           onClick={() => setShowAnswer(true)}
-          style={{ marginBottom: "1rem", background: "#eee", padding: "0.5rem", borderRadius: "6px" }}
+          style={{
+            marginBottom: "1rem",
+            background: "#eee",
+            padding: "0.5rem",
+            borderRadius: "6px",
+          }}
         >
           🤷 Give Up & Show Correct Answer
         </button>
       )}
 
       {showAnswer && (
-        <div style={{
-          marginBottom: "1rem",
-          background: "#f1f1f1",
-          padding: "1rem",
-          border: "1px solid #ccc",
-          borderRadius: "6px"
-        }}>
-          <p style={{ fontWeight: "bold", marginBottom: "0.5rem" }}>✅ Correct Sign Order:</p>
+        <div
+          style={{
+            marginBottom: "1rem",
+            background: "#f1f1f1",
+            padding: "1rem",
+            border: "1px solid #ccc",
+            borderRadius: "6px",
+          }}
+        >
+          <p style={{ fontWeight: "bold", marginBottom: "0.5rem" }}>
+            ✅ Correct Sign Order:
+          </p>
           <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
             {correctOrder.map((word, i) => (
               <span
@@ -191,7 +241,7 @@ function Level3() {
                   padding: "0.4rem 0.8rem",
                   backgroundColor: "#d2f4d2",
                   borderRadius: "999px",
-                  fontSize: "0.9rem"
+                  fontSize: "0.9rem",
                 }}
               >
                 {word}
@@ -201,39 +251,50 @@ function Level3() {
         </div>
       )}
 
-      <Webcam
-        audio={false}
-        mirrored
-        ref={webcamRef}
-        screenshotFormat="image/jpeg"
-        style={{ width: "100%", marginBottom: "1rem", borderRadius: "12px" }}
-        
-      />
-
-      {recordings.map((rec, index) => (
-        <div key={index} style={{ marginBottom: "1rem", border: "1px solid #ccc", padding: "0.5rem", borderRadius: "8px" }}>
-          <p><strong>{rec.word}</strong></p>
-          {rec.url ? (
-            <video src={rec.url} controls style={{ width: "100%" }} />
-          ) : (
-            <>
-              {recordingIndex === index ? (
-                <>
-                  <span style={{ marginRight: "1rem", color: "red" }}>🔴 Recording...</span>
-                  <button onClick={() => stopRecording(index)}>⏹ Stop</button>
-                </>
-              ) : (
-                <button onClick={() => startRecording(index)}>▶ Record</button>
+      {recordings.map((rec, index) => {
+        const signUrl = `https://asl-lex.org/visualization/?sign=${rec.word.toLowerCase().replace(/\s+/g, '_')}`;
+        return (
+          <div key={index} style={{ marginBottom: "1rem", border: "1px solid #ccc", padding: "0.5rem", borderRadius: "8px" }}>
+            <p>
+              <strong>{rec.word}</strong>
+              {showHint && (
+                <button
+                  onClick={() => window.open(signUrl, '_blank')}
+                  style={{
+                    marginLeft: '0.5rem',
+                    padding: '0.3rem 0.6rem',
+                    fontSize: '0.8rem',
+                    borderRadius: '6px',
+                    backgroundColor: '#eee',
+                    cursor: 'pointer'
+                  }}
+                >
+                  🎥 Hint
+                </button>
               )}
-            </>
-          )}
-          <div style={{ marginTop: "0.5rem" }}>
-            {index > 0 && <button onClick={() => handleReorder(index, index - 1)}>⬆ Move Up</button>}
-            {index < recordings.length - 1 && <button onClick={() => handleReorder(index, index + 1)}>⬇ Move Down</button>}
-            <button onClick={() => handleRemove(index)} style={{ marginLeft: "0.5rem", color: "red" }}>❌ Remove</button>
+            </p>
+            {rec.url ? (
+              <video src={rec.url} controls style={{ width: "100%" }} />
+            ) : (
+              <>
+                {recordingIndex === index ? (
+                  <>
+                    <span style={{ marginRight: "1rem", color: "red" }}>🔴 Recording...</span>
+                    <button onClick={() => stopRecording(index)}>⏹ Stop</button>
+                  </>
+                ) : (
+                  <button onClick={() => startRecording(index)}>▶ Record</button>
+                )}
+              </>
+            )}
+            <div style={{ marginTop: "0.5rem" }}>
+              {index > 0 && <button onClick={() => handleReorder(index, index - 1)}>⬆ Move Up</button>}
+              {index < recordings.length - 1 && <button onClick={() => handleReorder(index, index + 1)}>⬇ Move Down</button>}
+              <button onClick={() => handleRemove(index)} style={{ marginLeft: "0.5rem", color: "red" }}>❌ Remove</button>
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
 
       {recordings.length > 0 && (
         <div style={{ marginTop: "2rem" }}>
@@ -253,7 +314,7 @@ function Level3() {
             backgroundColor: "#e6f4ea",
             color: "#2e7d32",
             borderRadius: "6px",
-            fontSize: "0.9rem"
+            fontSize: "0.9rem",
           }}
         >
           ✅ Approved! Thank you for submitting your signs.
@@ -270,7 +331,7 @@ function Level3() {
             backgroundColor: "#fdecea",
             color: "#c62828",
             borderRadius: "6px",
-            fontSize: "0.9rem"
+            fontSize: "0.9rem",
           }}
         >
           ❌ Rejected. Please revise your signs.
@@ -283,42 +344,35 @@ function Level3() {
       )}
 
       {showModal && (
-        <div style={{
-          position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
-          background: "rgba(0,0,0,0.6)", display: "flex",
-          alignItems: "center", justifyContent: "center", zIndex: 999
-        }}>
-          <div style={{
-            background: "#fff",
-            padding: "2rem",
-            borderRadius: "1rem",
-            width: "90%",
-            maxWidth: "500px",
-            maxHeight: "90vh",
-            overflowY: "auto"
-          }}>
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "rgba(0,0,0,0.6)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 999,
+          }}
+        >
+          <div
+            style={{
+              background: "#fff",
+              padding: "2rem",
+              borderRadius: "1rem",
+              width: "90%",
+              maxWidth: "500px",
+              maxHeight: "90vh",
+              overflowY: "auto",
+            }}
+          >
             <h3>👩‍🏫 Researcher Review</h3>
             {recordings.map((rec, index) => (
               <div key={index} style={{ marginBottom: "1rem" }}>
                 <p><strong>Sign {index + 1}: {rec.word}</strong></p>
-
-                <button
-                  onClick={() => toggleHint(index)}
-                  style={{ marginBottom: "0.5rem", fontSize: "0.8rem" }}
-                >
-                  🧠 Hint
-                </button>
-
-                {visibleHints[index] && aslVideos[rec.word] && (
-                  <video
-                    src={aslVideos[rec.word]}
-                    autoPlay
-                    muted
-                    loop
-                    style={{ width: "100%", maxHeight: "160px", borderRadius: "6px", marginTop: "0.5rem" }}
-                  />
-                )}
-
                 <video
                   src={rec.url}
                   controls
@@ -334,12 +388,52 @@ function Level3() {
               style={{ width: "100%", padding: "0.5rem", marginTop: "1rem" }}
             />
             <div style={{ marginTop: "1rem", display: "flex", justifyContent: "space-between" }}>
-              <button onClick={handleReject} style={{ backgroundColor: "#f44336", color: "#fff", padding: "0.5rem 1rem", borderRadius: "6px" }}>❌ Reject</button>
-              <button onClick={handleApprove} style={{ backgroundColor: "#4caf50", color: "#fff", padding: "0.5rem 1rem", borderRadius: "6px" }}>✅ Approve</button>
+              <button
+                onClick={handleReject}
+                style={{ backgroundColor: "#f44336", color: "#fff", padding: "0.5rem 1rem", borderRadius: "6px" }}
+              >
+                ❌ Reject
+              </button>
+              <button
+                onClick={handleApprove}
+                style={{ backgroundColor: "#4caf50", color: "#fff", padding: "0.5rem 1rem", borderRadius: "6px" }}
+              >
+                ✅ Approve
+              </button>
             </div>
           </div>
         </div>
       )}
+
+      {/* Floating webcam preview in bottom-right corner */}
+      <div
+        style={{
+          position: "fixed",
+          bottom: "1rem",
+          right: "1rem",
+          width: "200px",
+          height: "140px",
+          border: "2px solid #ccc",
+          borderRadius: "12px",
+          overflow: "hidden",
+          zIndex: 1000,
+          backgroundColor: "#fff",
+          boxShadow: "0px 2px 10px rgba(0,0,0,0.2)"
+        }}
+      >
+        <Webcam
+          audio={false}
+          mirrored={false}
+          ref={webcamRef}
+          screenshotFormat="image/jpeg"
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover"
+          }}
+        />
+      </div>
+
     </div>
   );
 }

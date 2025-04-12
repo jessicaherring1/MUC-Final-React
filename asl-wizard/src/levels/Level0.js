@@ -1,57 +1,18 @@
-// Level0.js
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import HomeButton from '../HomeButton';
 
 const coreWords = [
-  {
-    word: "More",
-    scenario: "Your child wants another bite of food. What do you sign?"
-  },
-  {
-    word: "All Done",
-    videoUrl: "https://asl-lex.org/visualization/videos/all_done.mp4",
-    scenario: "Mealtime is over. What do you sign?"
-  },
-  {
-    word: "Eat",
-    videoUrl: "https://asl-lex.org/visualization/videos/eat.mp4",
-    scenario: "It's time for lunch. What do you sign?"
-  },
-  {
-    word: "Drink",
-    videoUrl: "https://asl-lex.org/visualization/videos/drink.mp4",
-    scenario: "Your child is thirsty. What do you sign?"
-  },
-  {
-    word: "Bathroom",
-    videoUrl: "https://asl-lex.org/visualization/videos/bathroom.mp4",
-    scenario: "Your child needs to go potty. What do you sign?"
-  },
-  {
-    word: "Help",
-    videoUrl: "https://asl-lex.org/visualization/videos/help.mp4",
-    scenario: "Your child is struggling with a toy. What do you sign?"
-  },
-  {
-    word: "Sleep",
-    videoUrl: "https://asl-lex.org/visualization/videos/sleep.mp4",
-    scenario: "It's bedtime. What do you sign?"
-  },
-  {
-    word: "Hurt",
-    videoUrl: "https://asl-lex.org/visualization/videos/hurt.mp4",
-    scenario: "Your child scraped their knee. What do you sign?"
-  },
-  {
-    word: "Yes",
-    videoUrl: "https://asl-lex.org/visualization/videos/yes.mp4",
-    scenario: "Do you want to play again? What do you sign?"
-  },
-  {
-    word: "No",
-    videoUrl: "https://asl-lex.org/visualization/videos/no.mp4",
-    scenario: "Your child shouldn't touch that. What do you sign?"
-  }
+  { word: "You", scenario: "You're offering a toy to your child. What do you sign first?" },
+  { word: "Me", scenario: "Your child points at you asking for help. How do you respond?" },
+  { word: "Want", scenario: "Your child reaches for a snack. What do you sign?" },
+  { word: "More", scenario: "Your child finishes their drink and gestures again. What do you sign?" },
+  { word: "Now", scenario: "Your child is getting impatient for food. What time word do you sign?" },
+  { word: "Eat", scenario: "You're about to feed your child lunch. What do you sign?" },
+  { word: "Drink", scenario: "You hand your child a bottle. What do you sign?" },
+  { word: "Help", scenario: "Your child is frustrated with a toy. What do you sign?" },
+  { word: "Bathroom", scenario: "Your child is starting potty training. What do you sign?" },
+  { word: "Sleep", scenario: "You're tucking your child into bed. What do you sign?" }
 ];
 
 export default function Level0() {
@@ -72,9 +33,9 @@ export default function Level0() {
 
   const sanitizedWord = coreWords[current].word.toLowerCase().replace(/\s+/g, '_');
 
-
   return (
     <div style={{ padding: '1rem' }}>
+      <HomeButton />
       <AnimatePresence mode="wait">
         {showDone ? (
           <motion.div
@@ -87,7 +48,9 @@ export default function Level0() {
             <div style={{ textAlign: 'center', backgroundColor: '#e6ffed', padding: '2rem', borderRadius: '1rem' }}>
               <h2 style={{ fontSize: '1.5rem', color: '#2e7d32' }}>🎉 You did it!</h2>
               <p>You've completed Level 0: First Signs.</p>
-              <button onClick={() => window.location.href = "/level1"} style={{ marginTop: '1rem', padding: '0.5rem 1rem' }}>I'm Ready for Level 1</button>
+              <button onClick={() => window.location.href = "/level1"} style={{ marginTop: '1rem', padding: '0.5rem 1rem' }}>
+                I'm Ready for Level 1
+              </button>
             </div>
           </motion.div>
         ) : (
@@ -99,7 +62,9 @@ export default function Level0() {
             transition={{ duration: 0.3 }}
           >
             <div style={{ textAlign: 'center', border: '1px solid #ccc', padding: '2rem', borderRadius: '1rem' }}>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>Sign: {coreWords[current].word}</h2>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>
+                Sign: {coreWords[current].word}
+              </h2>
 
               <iframe
                 key={sanitizedWord}
@@ -110,10 +75,32 @@ export default function Level0() {
                 style={{ border: 'none', borderRadius: '12px', margin: '1rem 0' }}
               />
 
+              <button
+                onClick={() =>
+                  window.open(
+                    `https://asl-lex.org/visualization/?sign=${sanitizedWord}`,
+                    '_blank'
+                  )
+                }
+                style={{
+                  backgroundColor: '#6c63ff',
+                  color: '#fff',
+                  padding: '0.6rem 1.2rem',
+                  borderRadius: '8px',
+                  marginBottom: '1rem',
+                  border: 'none',
+                  cursor: 'pointer'
+                }}
+              >
+                🎥 View Sign with Video
+              </button>
 
               <p style={{ fontStyle: 'italic', color: '#555' }}>{coreWords[current].scenario}</p>
+
               <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '1rem' }}>
-                <button onClick={prev} disabled={current === 0} style={{ padding: '0.5rem 1rem' }}>Previous</button>
+                <button onClick={prev} disabled={current === 0} style={{ padding: '0.5rem 1rem' }}>
+                  Previous
+                </button>
                 <button onClick={next} style={{ padding: '0.5rem 1rem' }}>
                   {current === coreWords.length - 1 ? "Finish" : "Next"}
                 </button>
