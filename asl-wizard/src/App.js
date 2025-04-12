@@ -5,7 +5,7 @@ import HomePage from './HomePage';
 import Level0 from './levels/Level0';
 import Level1 from './levels/Level1';
 import Level3 from './levels/Level3';
-
+import Level2 from './levels/Level2';
 
 function App() {
   return (
@@ -24,8 +24,7 @@ function App() {
             />
           }
         />
-        {/* Future routes for Level 2 and Level 3 */}
-        {/* <Route path="/level2" element={<Level2 />} /> */}
+        <Route path="/level2" element={<Level2 />} />
         <Route path="/level3" element={<Level3 />} />
       </Routes>
     </Router>
