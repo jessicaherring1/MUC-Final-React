@@ -31,7 +31,7 @@ const levels = [
   },
   {
     type: "sign-and-type",
-    sentence: "How’s the weather today?"
+    sentence: "What is the baby doing in the image above?"
   },
   {
     type: "complete"
@@ -274,7 +274,7 @@ const App = () => {
             alt="Baby Crying" 
             style={{ width: "100%", maxHeight: "200px", objectFit: "contain", marginBottom: "1rem", borderRadius: "12px" }} 
           />
-          <p><strong>Respond to this sentence:</strong><br />{currentLevel.sentence}</p>
+          <p><strong>Answer this question using the signs you would use in ASL: </strong><br/><br />{currentLevel.sentence}</p>
           <input
             type="text"
             placeholder="Type your answer here..."
